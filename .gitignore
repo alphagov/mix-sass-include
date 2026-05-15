@@ -1,0 +1,10 @@
+node_modules
+# Yarn local files
+# https://github.com/yarnpkg/berry/issues/454#issuecomment-1411548086
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
