@@ -276,13 +276,21 @@ The output CSS shows a lot of `govuk-functional-colour`, which shouldn't happen.
 
 Unfortunately, `settings/colour-functional.scss` cannot `@use` `helpers/colour` as it creates a circular dependency between the two files. However, we can extract the legacy colours in their own files to solve the problem.
 
+## Fixing the `govuk-text-colour` mixin
+
+In a similar fashion, the `govuk-text-colour` mixin does not have access to `govuk-functional-colour` because of a missing `@use "../helpers/colour"`, which can be easily fixed.
+
+At that point the snapshot changes now show only effect of moving to modules.
+
+The output when built with `@use` matches [the effect we saw on the Design System site](https://github.com/alphagov/govuk-design-system/issues/5284#issuecomment-4432406880).
+
 ## TODO
 
 - [ ] Raise an issue on MoJ Frontend repository to let them know of issues resolving `govuk-frontend` when the library is hoisted by npm. Recommendation would be to use `pkg:` URLs, but it's likely a breaking change.
 - [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
   - [x] Legacy functional colour values hold `govuk-functional-colour`
-  - [ ] The `govuk-text-colour` mixin returns `govuk-functional-colour(text)` rather than its output
+  - [x] The `govuk-text-colour` mixin returns `govuk-functional-colour(text)` rather than its output
 - [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
     - [ ] Devise a way to restore the feature if necessary
 - [ ] Decide how to let libraries configure GOV.UK Frontend while allowing the configuration to be overriden by users.
