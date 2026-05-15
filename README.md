@@ -40,6 +40,91 @@ Error: Can't find stylesheet to import.
 
 MoJ Frontend loads GOV.UK Frontend itself, looking it up inside its `node_modules` folder. `govuk-frontend` is however hoisted in the project's `node_modules` (both because `govuk-frontend` is an explicit dependency of the project, and because it's a dependency of `hmrc-frontend`).
 
+### Installing `govuk-frontend@6.2.0-beta.0`
+
+Installing the beta of GOV.UK Frontend requires a little `overrides` in the `package.json`. Without it `npm` complains of conflicting required versions for `govuk-frontend`:
+
+```sh
+npm error code ERESOLVE
+npm error ERESOLVE could not resolve
+npm error
+npm error While resolving: @ministryofjustice/frontend@9.0.0
+npm error Found: govuk-frontend@6.2.0-beta.0
+npm error node_modules/govuk-frontend
+npm error   govuk-frontend@"^6.2.0-beta.0" from the root project
+npm error
+npm error Could not resolve dependency:
+npm error peer govuk-frontend@"^6.0.0" from @ministryofjustice/frontend@9.0.0
+npm error node_modules/@ministryofjustice/frontend
+npm error   @ministryofjustice/frontend@"^9.0.0" from the root project
+npm error
+npm error Conflicting peer dependency: govuk-frontend@6.1.0
+npm error node_modules/govuk-frontend
+npm error   peer govuk-frontend@"^6.0.0" from @ministryofjustice/frontend@9.0.0
+npm error   node_modules/@ministryofjustice/frontend
+npm error     @ministryofjustice/frontend@"^9.0.0" from the root project
+npm error
+npm error Fix the upstream dependency conflict, or retry this command with --force or --legacy-peer-deps to accept an incorrect (and potentially broken) dependency resolution.
+npm error
+npm error
+npm error For a full report see:
+npm error /Users/romaric.pascal/.npm/_logs/2026-05-15T14_46_37_711Z-eresolve-report.txt
+npm error A complete log of this run can be found in: /Users/romaric.pascal/.npm/_logs/2026-05-15T14_46_37_711Z-debug-0.log
+```
+
+Installing only `govuk-frontend` and `hmrc-frontend` shows some warnings, but not an error.
+
+```sh
+npm install govuk-frontend@next hmrc-frontend 
+npm warn ERESOLVE overriding peer dependency
+npm warn While resolving: @ministryofjustice/frontend@9.0.0
+npm warn Found: govuk-frontend@6.2.0-beta.0
+npm warn node_modules/govuk-frontend
+npm warn   govuk-frontend@"6.2.0-beta.0" from the root project
+npm warn
+npm warn Could not resolve dependency:
+npm warn peer govuk-frontend@"^6.0.0" from @ministryofjustice/frontend@9.0.0
+npm warn node_modules/@ministryofjustice/frontend
+npm warn
+npm warn Conflicting peer dependency: govuk-frontend@6.1.0
+npm warn node_modules/govuk-frontend
+npm warn   peer govuk-frontend@"^6.0.0" from @ministryofjustice/frontend@9.0.0
+npm warn   node_modules/@ministryofjustice/frontend
+
+removed 1 package, changed 2 packages, and audited 18 packages in 4s
+
+5 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+```
+
+Note that installing with `yarn` doesn't run into any issues.
+
+### Compiling
+
+`npm run build:import` is successful, however the snapshot does not match that of 6.1.0. It shows quite a few occurences of `govuk-functional-colour` function calls. Did we forget to `@forward` it?
+
+When including stylesheets with `@use`, Sass compilation fails because the `base` module from `govuk-frontend` is [being configured by `@ministryofjustice/frontend`](https://github.com/ministryofjustice/moj-frontend/blob/4843606f47dd44b8eae78643c7925a11a3eaf3d7/src/moj/vendor/govuk-frontend/_base.scss) after having been included already by `govuk-frontend`.
+
+
+```sh
+Error: This module was already loaded, so it can't be configured using "with".
+  ┌──> node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_base.scss
+1 │ @forward "pkg:govuk-frontend/dist/govuk/base" with ($govuk-suppressed-warnings: ());
+  │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ new load
+  ╵
+  ┌──> node_modules/govuk-frontend/dist/govuk/index.scss
+1 │ @forward "base";
+  │ ━━━━━━━━━━━━━━━ original load
+  ╵
+  node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_base.scss 1:1   @forward
+  node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss 8:1  @forward
+  node_modules/@ministryofjustice/frontend/moj/_base.scss 5:1                         @forward
+  node_modules/@ministryofjustice/frontend/moj/all.scss 1:1                           @use
+  use.scss 3:1                  
+```
+
 ### Resolving govuk-frontend from @ministryofjustice/frontend
 
 Using patch-package, updating the URL used to load GOV.UK Frontend to a pkg: URL enables compilation with build:import.
@@ -76,5 +161,7 @@ Beyond the behaviour witnessed without configuration, with `@use`, MoJ Frontend 
 ## TODO
 
 - [ ] Raise an issue on MoJ Frontend repository to let them know of issues resolving `govuk-frontend` when the library is hoisted by npm. Recommendation would be to use `pkg:` URLs, but it's likely a breaking change.
+- [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
+- [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
 
 
