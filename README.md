@@ -69,6 +69,15 @@ Beyond the behaviour witnessed without configuration, with `@use`, MoJ Frontend 
 // @use 'pkg:govuk-frontend/dist/govuk/base' 
 ```
 
+HMRC Frontend does not get the configured values either. Thinking this is due to HMRC Frontend `@import`ing GOV.UK Frontend internally, leading to Sass re-loading an unconfigured stylesheets from GOV.UK Frontend when HMRC Frontend is loaded as a module.
+
+```scss
+@use 'pkg:govuk-frontend'
+//  @import 'base'
+@use 'pkg:hmrc-frontend'
+// @import "../../../../govuk-frontend/dist/govuk/helpers/links"; 
+```
+
 ### Installing `govuk-frontend@6.2.0-beta.0`
 
 Installing the beta of GOV.UK Frontend requires a little `overrides` in the `package.json`. Without it `npm` complains of conflicting required versions for `govuk-frontend`:
@@ -276,14 +285,15 @@ The output CSS shows a lot of `govuk-functional-colour`, which shouldn't happen.
 
 Unfortunately, `settings/colour-functional.scss` cannot `@use` `helpers/colour` as it creates a circular dependency between the two files. However, we can extract the legacy colours in their own files to solve the problem.
 
-HMRC Frontend does not get the configured values either. Thinking this is due to HMRC Frontend `@import`ing GOV.UK Frontend internally, leading to Sass re-loading an unconfigured stylesheets from GOV.UK Frontend when HMRC Frontend is loaded as a module.
+### Fixing the `govuk-text-colour` mixin
 
-```scss
-@use 'pkg:govuk-frontend'
-//  @import 'base'
-@use 'pkg:hmrc-frontend'
-// @import "../../../../govuk-frontend/dist/govuk/helpers/links"; 
-```
+In a similar fashion, the `govuk-text-colour` mixin does not have access to `govuk-functional-colour` because of a missing `@use "../helpers/colour"`, which can be easily fixed.
+
+At that point the snapshot changes now show only effect of updating to 6.2.0-beta.0.
+
+### Effect of updating to 6.2.0-beta.0
+
+The output when built with `@use` matches [the effect we saw on the Design System site](https://github.com/alphagov/govuk-design-system/issues/5284#issuecomment-4432406880).
 
 ## TODO
 
@@ -291,7 +301,7 @@ HMRC Frontend does not get the configured values either. Thinking this is due to
 - [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
   - [x] Legacy functional colour values hold `govuk-functional-colour`
-  - [ ] The `govuk-text-colour` mixin returns `govuk-functional-colour(text)` rather than its output
+  - [x] The `govuk-text-colour` mixin returns `govuk-functional-colour(text)` rather than its output
 - [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
     - [ ] Devise a way to restore the feature if necessary
 - [ ] Decide how to let libraries configure GOV.UK Frontend while allowing the configuration to be overriden by users.
