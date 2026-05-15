@@ -1,0 +1,28 @@
+diff --git a/node_modules/govuk-frontend/dist/govuk/_base.scss b/node_modules/govuk-frontend/dist/govuk/_base.scss
+index 8d0b69c..07885c6 100644
+--- a/node_modules/govuk-frontend/dist/govuk/_base.scss
++++ b/node_modules/govuk-frontend/dist/govuk/_base.scss
+@@ -1,5 +1,23 @@
++@use "sass:map";
++
+ @forward "settings";
+ @forward "tools";
+ @forward "helpers";
+ @forward "components/button/settings";
+ 
++@use "settings" as *;
++
++@mixin govuk-configure($settings) {
++  // Assets override
++  $govuk-assets-path: map.get($settings,assets-path) !global;
++  $govuk-images-path: map.get($settings, images-path) !global;
++  $govuk-fonts-path: map.get($settings,fonts-path) !global;
++
++  // Measurements override
++  $govuk-gutter: map.get($settings,gutter) !global;
++  $govuk-page-width: map.get($settings,page-width) !global;
++
++  // Typography override
++  $govuk-font-family: map.get($settings, font-family) !global;
++  $govuk-include-default-font-face: map.get($settings, include-default-font-face) !global;
++}
