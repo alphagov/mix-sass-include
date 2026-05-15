@@ -125,9 +125,45 @@ Error: This module was already loaded, so it can't be configured using "with".
   use.scss 3:1                  
 ```
 
-### Resolving govuk-frontend from @ministryofjustice/frontend
+### Enabling compilation
 
-Using patch-package, updating the URL used to load GOV.UK Frontend to a pkg: URL enables compilation with build:import.
+Removing the `with` clause configuring `govuk-frontend` in `@ministryofjustice/frontend`'s `vendor/govuk-frontend/_base.scss` solves the error... but compilation still breaks because `vendor/govuk-frontend/_base.scss` tries to configure the `base` module as well.
+
+```sh
+Error: This module was already loaded, so it can't be configured using "with".
+   ┌──> node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_base.scss
+1  │   @forward "pkg:govuk-frontend/base";
+   │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ new load
+   ╵
+   ┌──> node_modules/govuk-frontend/dist/govuk/index.scss
+1  │   @forward "base";
+   │   ━━━━━━━━━━━━━━━ original load
+   ╵
+   ┌──> node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss
+8  │ ┌ @forward "base" with (
+9  │ │   // Assets override
+10 │ │   $govuk-assets-path: $moj-assets-path,
+11 │ │   $govuk-images-path: $moj-images-path,
+12 │ │   $govuk-fonts-path: $moj-fonts-path,
+13 │ │ 
+14 │ │   // Measurements override
+15 │ │   $govuk-gutter: $moj-gutter,
+16 │ │   $govuk-page-width: $moj-page-width,
+17 │ │ 
+18 │ │   // Typography override
+19 │ │   $govuk-font-family: $moj-font-family,
+20 │ │   $govuk-include-default-font-face: $moj-include-default-font-face
+21 │ │ );
+   │ └─^ configuration
+   ╵
+  node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_base.scss 1:1   @forward
+  node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss 8:1  @forward
+  node_modules/@ministryofjustice/frontend/moj/_base.scss 5:1                         @forward
+  node_modules/@ministryofjustice/frontend/moj/all.scss 1:1                           @use
+  use.scss 3:1                                                                        
+```
+
+To be continued
 
 ### Difference between `@use` and `@import`
 
@@ -163,5 +199,6 @@ Beyond the behaviour witnessed without configuration, with `@use`, MoJ Frontend 
 - [ ] Raise an issue on MoJ Frontend repository to let them know of issues resolving `govuk-frontend` when the library is hoisted by npm. Recommendation would be to use `pkg:` URLs, but it's likely a breaking change.
 - [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
-
+- [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
+    - [ ] Devise a way to restore the feature if necessary
 
