@@ -163,7 +163,83 @@ Error: This module was already loaded, so it can't be configured using "with".
   use.scss 3:1                                                                        
 ```
 
-To be continued
+To fix that one, we need to update how GOV.UK Frontend can be configured, allowing not only to do `@use ... with`, but also to call a `govuk-configure` mixin for late configuration after `govuk-frontend` has already been loaded.
+
+In case of what MoJ Frontend was configuring:
+
+```scss
+@include govuk-configure((
+  // Assets override
+  assets-path: $moj-assets-path,
+  images-path: $moj-images-path,
+  fonts-path: $moj-fonts-path,
+
+  // Measurements override
+  gutter: $moj-gutter,
+  page-width: $moj-page-width,
+
+  // Typography override
+  font-family: $moj-font-family,
+  include-default-font-face: $moj-include-default-font-face
+))
+```
+
+Unfortunately, Sass doesn't make our job easy there, as it [doesn't have a dynamic way to assign values to variables (see 'Heads up')](https://sass-lang.com/documentation/variables/#advanced-variable-functions). So we'll either need to:
+1. manually maintain the variables that can be assigned through the mixin, which facilitates configuration with `@use ... with` but be tricky to maintain
+
+    ```scss
+    @use "settings" as *;
+
+    /// Only configure the variables set by MoJ Frontend
+    /// We may also want to use `meta.keywords` to have 
+    /// a clearer mapping between the names of our internal settings
+    /// and the arguments of the function
+    /// https://sass-lang.com/documentation/modules/meta/#keywords
+    @mixin govuk-configure($settings) {
+        // Assets override
+        $govuk-assets-path: map.get($settings,assets-path) !global;
+        $govuk-images-path: map.get($settings, images-path) !global;
+        $govuk-fonts-path: map.get($settings,fonts-path) !global;
+
+        // Measurements override
+        $govuk-gutter: map.get($settings,gutter) !global;
+        $govuk-page-width: map.get($settings,page-width) !global;
+
+        // Typography override
+        $govuk-font-family: map.get($settings, font-family) !global;
+        $govuk-include-default-font-face: map.get($settings, include-default-font-face) !global;
+    }
+    ```
+2. move to organising our settings in a map, which would facilitate the configuration through the mixin (because we could easily `map.set` from the settings we receive) but make `@use ... with` a little more verbose and less standard.
+
+Another thing to consider is what happens to user configuration. For example if someone does the following:
+
+```scss
+@use 'pkg:govuk-frontend' with (
+    $govuk-page-width: 1400px
+);
+@use 'pkg:@ministryofjustice/frontend'; // Which also configures page-width
+```
+
+How would MoJ Frontend understand that GOV.UK Frontend has already been configured? We may need:
+- an API for other Design Systems to understand whether GOV.UK Frontend has already been configured
+- preventing configuration of variables with Sass' `@use ... with` in favour of late configuration through the mixin
+
+    ```scss
+    @use 'pkg:govuk-frontend' as *;
+    @use 'pkg:@ministryofjustice/frontend';
+
+    @include govuk-configure((
+        page-width: 1400px
+    ));
+    ```
+
+Both approach are not incompatible with each other. If `@use ... with` configured a `$govuk-settings` `Map` variable rather than individual setting variables, we could support both:
+
+- early configuration, as it'd be easy for later libraries to check if `$govuk-settings` has a specific key
+- late configuration through the mixin, which would also be used to apply the configuration from `$govuk-settings`
+
+This requires a deeper discussion 😊
 
 ### Difference between `@use` and `@import`
 
@@ -210,4 +286,4 @@ HMRC Frontend does not get the configured values either. Thinking this is due to
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
 - [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
     - [ ] Devise a way to restore the feature if necessary
-
+- [ ] Decide how to let libraries configure GOV.UK Frontend while allowing the configuration to be overriden by users.

@@ -8,3 +8,44 @@ index 88b5535..dafdd44 100644
  
  /*# sourceMappingURL=_base.scss.map */
 \ No newline at end of file
+diff --git a/node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss b/node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss
+index 6295ec0..397523d 100644
+--- a/node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss
++++ b/node_modules/@ministryofjustice/frontend/moj/vendor/govuk-frontend/_index.scss
+@@ -4,20 +4,25 @@
+ // Use settings for overrides
+ @use "../../settings/all" as *;
+ 
+-// GOV.UK Frontend with settings
+-@forward "base" with (
++@forward "base";
++
++@use "pkg:govuk-frontend/base" as *;
++
++@include govuk-configure((
+   // Assets override
+-  $govuk-assets-path: $moj-assets-path,
+-  $govuk-images-path: $moj-images-path,
+-  $govuk-fonts-path: $moj-fonts-path,
++  assets-path: $moj-assets-path,
++  images-path: $moj-images-path,
++  fonts-path: $moj-fonts-path,
+ 
+   // Measurements override
+-  $govuk-gutter: $moj-gutter,
+-  $govuk-page-width: $moj-page-width,
++  gutter: $moj-gutter,
++  page-width: $moj-page-width,
+ 
+   // Typography override
+-  $govuk-font-family: $moj-font-family,
+-  $govuk-include-default-font-face: $moj-include-default-font-face
+-);
++  font-family: $moj-font-family,
++  include-default-font-face: $moj-include-default-font-face
++))
++
++
+ 
+ /*# sourceMappingURL=_index.scss.map */
+\ No newline at end of file
