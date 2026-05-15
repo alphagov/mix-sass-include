@@ -40,6 +40,35 @@ Error: Can't find stylesheet to import.
 
 MoJ Frontend loads GOV.UK Frontend itself, looking it up inside its `node_modules` folder. `govuk-frontend` is however hoisted in the project's `node_modules` (both because `govuk-frontend` is an explicit dependency of the project, and because it's a dependency of `hmrc-frontend`).
 
+### Difference between `@use` and `@import`
+
+Custom properties get duplicated, appearing both at the start of GOV.UK Frontend and HMRC Frontend. It's only an issue if between `@use "pkg:govuk-frontend"` and `@use "pkg:@ministryofjustice/frontend"` there's another library redefining the custom properties, as the duplicates from MoJ would override the redefinitions.
+
+Things break down for HMRC's use of [`@extend` with `.govuk-link`](https://github.com/hmrc/hmrc-frontend/blob/5ef16a3f442621563476598d61592963cfff9411/src/components/status-tags-in-task-list-pages/_status-tags-in-task-list-pages.scss#L31): Sass doesn't generate the correct `.govuk-link, .app-task-list__task-name > a` selector, only `.govuk-link`. Same goes with the [extension of `%govuk-heading-m`](https://github.com/hmrc/hmrc-frontend/blob/5ef16a3f442621563476598d61592963cfff9411/src/components/timeline/_timeline.scss#L26) in the timeline component.
+
+We get some duplication from the typography selectors as well, due to HMRC explicitely `@import`ing GOV.UK Frontend's `core/typography` modules.
+
+### Applying configuration with the current version of GOV.UK Frontend
+
+#### With `@import`
+
+Things seem to work as expected
+
+- brand colour seems applied OK to both MoJ and HMRC Frontend
+- MoJ keeps the `"GDS Transport", arial, sans-serif` font family. This is expected as [GOV.UK Frontend is re-configured](https://github.com/ministryofjustice/moj-frontend/blob/5403390cee829b1b5f7392f0a01e760ffc1ee3a8/src/moj/vendor/govuk-frontend/_index.scss#L19) with the [value of `$moj-font-family`](https://github.com/ministryofjustice/moj-frontend/blob/5403390cee829b1b5f7392f0a01e760ffc1ee3a8/src/moj/settings/_typography.scss#L9) and MoJ Frontend doesn't account for `$govuk-font-family` being already set when being loaded. Something to make MoJ Frontend aware of, but not due to GOV.UK Frontend's structure.
+- It seems only GOV.UK Frontend uses `$govuk-asset-url` and `$govuk-font-url-function` variables.
+
+#### With `@use`
+
+Beyond the behaviour witnessed without configuration, with `@use`, MoJ Frontend does not get the configured brand colour. Thinking this is due to the fact that GOV.UK Frontend `@import`s base where MoJ Frontend `@use`s it:
+
+```scss
+@use 'pkg:govuk-frontend'
+//  @import 'base'
+@use 'pkg:@ministryofjustice/frontend'
+// @use 'pkg:govuk-frontend/dist/govuk/base' 
+```
+
 ### Installing `govuk-frontend@6.2.0-beta.0`
 
 Installing the beta of GOV.UK Frontend requires a little `overrides` in the `package.json`. Without it `npm` complains of conflicting required versions for `govuk-frontend`:
@@ -241,40 +270,19 @@ Both approach are not incompatible with each other. If `@use ... with` configure
 
 This requires a deeper discussion 😊
 
-### Difference between `@use` and `@import`
+### Fixing legacy functional colours
 
-Custom properties get duplicated, appearing both at the start of GOV.UK Frontend and HMRC Frontend. It's only an issue if between `@use "pkg:govuk-frontend"` and `@use "pkg:@ministryofjustice/frontend"` there's another library redefining the custom properties, as the duplicates from MoJ would override the redefinitions.
+The output CSS shows a lot of `govuk-functional-colour`, which shouldn't happen. This is due to the [`govuk-functional-colour` function not being defined in the `settings/colour-functional.scss` file](https://github.com/alphagov/govuk-frontend/blob/ff8a168f4fa084b88952762ba83ce51f705276ff/packages/govuk-frontend/src/govuk/settings/_colours-functional.scss#L181). This makes Sass keep the `govuk-functional-colour` calls in the output.
 
-Things break down for HMRC's use of [`@extend` with `.govuk-link`](https://github.com/hmrc/hmrc-frontend/blob/5ef16a3f442621563476598d61592963cfff9411/src/components/status-tags-in-task-list-pages/_status-tags-in-task-list-pages.scss#L31): Sass doesn't generate the correct `.govuk-link, .app-task-list__task-name > a` selector, only `.govuk-link`. Same goes with the [extension of `%govuk-heading-m`](https://github.com/hmrc/hmrc-frontend/blob/5ef16a3f442621563476598d61592963cfff9411/src/components/timeline/_timeline.scss#L26) in the timeline component.
-
-We get some duplication from the typography selectors as well, due to HMRC explicitely `@import`ing GOV.UK Frontend's `core/typography` modules.
-
-### Applying configuration with the current version of GOV.UK Frontend
-
-#### With `@import`
-
-Things seem to work as expected
-
-- brand colour seems applied OK to both MoJ and HMRC Frontend
-- MoJ keeps the `"GDS Transport", arial, sans-serif` font family. This is expected as [GOV.UK Frontend is re-configured](https://github.com/ministryofjustice/moj-frontend/blob/5403390cee829b1b5f7392f0a01e760ffc1ee3a8/src/moj/vendor/govuk-frontend/_index.scss#L19) with the [value of `$moj-font-family`](https://github.com/ministryofjustice/moj-frontend/blob/5403390cee829b1b5f7392f0a01e760ffc1ee3a8/src/moj/settings/_typography.scss#L9) and MoJ Frontend doesn't account for `$govuk-font-family` being already set when being loaded. Something to make MoJ Frontend aware of, but not due to GOV.UK Frontend's structure.
-- It seems only GOV.UK Frontend uses `$govuk-asset-url` and `$govuk-font-url-function` variables.
-
-#### With `@use`
-
-Beyond the behaviour witnessed without configuration, with `@use`, MoJ Frontend does not get the configured brand colour. Thinking this is due to the fact that GOV.UK Frontend `@import`s base where MoJ Frontend `@use`s it:
-
-```scss
-@use 'pkg:govuk-frontend'
-//  @import 'base'
-@use 'pkg:@ministryofjustice/frontend'
-// @use 'pkg:govuk-frontend/dist/govuk/base' 
-```
+Unfortunately, `settings/colour-functional.scss` cannot `@use` `helpers/colour` as it creates a circular dependency between the two files. However, we can extract the legacy colours in their own files to solve the problem.
 
 ## TODO
 
 - [ ] Raise an issue on MoJ Frontend repository to let them know of issues resolving `govuk-frontend` when the library is hoisted by npm. Recommendation would be to use `pkg:` URLs, but it's likely a breaking change.
 - [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
+  - [x] Legacy functional colour values hold `govuk-functional-colour`
+  - [ ] The `govuk-text-colour` mixin returns `govuk-functional-colour(text)` rather than its output
 - [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
     - [ ] Devise a way to restore the feature if necessary
 - [ ] Decide how to let libraries configure GOV.UK Frontend while allowing the configuration to be overriden by users.
