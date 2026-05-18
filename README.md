@@ -295,9 +295,19 @@ At that point the snapshot changes now show only effect of updating to 6.2.0-bet
 
 The output when built with `@use` matches [the effect we saw on the Design System site](https://github.com/alphagov/govuk-design-system/issues/5284#issuecomment-4432406880).
 
+When it comes to configuration, our added support for `@use` now makes MoJ Frontend react to the `brand` functional colour having been configured in GOV.UK Frontend when built with `@use` as well 🥳.
+
+Nothing changes for HMRC Frontend, even if loaded with `@import`. Don't think there's much we can do there, as HRMC `@import`s GOV.UK Frontend internally.
+
+The output when build with `@import` sees quite a few bits of extra CSS:
+- custom properties get output a second time at the start of HMRC Frontend. There's a potential risk if the variables were overriden before the `@import` of `hmrc-frontend`.
+- typography styles are output again due to an explicit import in [the `timeline` component](https://github.com/hmrc/hmrc-frontend/blob/33076d52c53d401c2ee6d4a88a3104eded44d328/src/components/timeline/_timeline.scss#L1). On the bright side [`@extend` seems to now be doing its job as expected](https://github.com/hmrc/hmrc-frontend/blob/33076d52c53d401c2ee6d4a88a3104eded44d328/src/components/timeline/_timeline.scss#L26)
+- the clearfix class is output a second time because of an import in [the `user-research-banner` component](https://github.com/hmrc/hmrc-frontend/blob/33076d52c53d401c2ee6d4a88a3104eded44d328/src/components/user-research-banner/_user-research-banner.scss#L3)
+
 ## TODO
 
 - [ ] Raise an issue on MoJ Frontend repository to let them know of issues resolving `govuk-frontend` when the library is hoisted by npm. Recommendation would be to use `pkg:` URLs, but it's likely a breaking change.
+- [ ] Raise an issue on HMRC Frontend as `$govuk-brand-colour` is included in user-research-banner thanks to [other GOV.UK Frontend files being imported](https://github.com/hmrc/hmrc-frontend/blob/main/src/components/user-research-banner/_user-research-banner.scss#L1-L3) rather than the component importing `base`.
 - [ ] Investigate what will happen when we publish 6.2.0. Will there be errors in Prototype Kit projects running MoJ and GOV.UK Frontend in parallel?
 - [ ] What's happening to `govuk-functional-colour` when used with `@import`? Are other functions affected?
   - [x] Legacy functional colour values hold `govuk-functional-colour`
@@ -305,3 +315,4 @@ The output when built with `@use` matches [the effect we saw on the Design Syste
 - [ ] Check with MoJ why they're clearing the list of suppressed warning in their library when loading `govuk-frontend`'s base
     - [ ] Devise a way to restore the feature if necessary
 - [ ] Decide how to let libraries configure GOV.UK Frontend while allowing the configuration to be overriden by users.
+  - [ ] Also how to handle libraries needing to `@import` GOV.UK Frontend and getting configured when GOV.UK Frontend is configured

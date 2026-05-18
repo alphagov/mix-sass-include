@@ -17,8 +17,8 @@ exports[`applies configuration consistently 1`] = `
    -moz-osx-font-smoothing: grayscale;
  }
 @@ -54,54 +54,54 @@
-   src: url("example.woff") format("woff2"), url("example.woff") format("woff");
    font-display: fallback;
+   src: url("example.woff") format("woff2"), url("example.woff") format("woff");
  }
  @media print {
 -  .govuk-link {
@@ -82,45 +82,45 @@ exports[`applies configuration consistently 1`] = `
      font-size: 90%;
      word-wrap: break-word;
    }
-@@ -296,43 +296,43 @@
+@@ -229,43 +229,43 @@
    .govuk-heading-l {
      margin-bottom: 30px;
    }
  }
 -.govuk-heading-m {
-+.govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++.hmrc-timeline__event-title, .govuk-heading-m {
    font-family: "Comic Sans MS", "GDS Transport";
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
  }
  @media print {
 -  .govuk-heading-m {
-+  .govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++  .hmrc-timeline__event-title, .govuk-heading-m {
      font-family: sans-serif;
    }
  }
 -.govuk-heading-m {
-+.govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++.hmrc-timeline__event-title, .govuk-heading-m {
    font-weight: 700;
    font-size: 1.3125rem;
    line-height: 1.1904761905;
  }
  @media (min-width: 40.0625em) {
 -  .govuk-heading-m {
-+  .govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++  .hmrc-timeline__event-title, .govuk-heading-m {
      font-size: 1.5rem;
      line-height: 1.25;
    }
  }
  @media print {
 -  .govuk-heading-m {
-+  .govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++  .hmrc-timeline__event-title, .govuk-heading-m {
      font-size: 18pt;
      line-height: 1.15;
    }
  }
 -.govuk-heading-m {
-+.govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++.hmrc-timeline__event-title, .govuk-heading-m {
    display: block;
    margin-top: 0;
    color: var(--govuk-text-colour, #0b0c0c);
@@ -128,99 +128,12 @@ exports[`applies configuration consistently 1`] = `
  }
  @media (min-width: 40.0625em) {
 -  .govuk-heading-m {
-+  .govuk-heading-m, .hmrc-timeline__event-title, .govuk-heading-m {
++  .hmrc-timeline__event-title, .govuk-heading-m {
      margin-bottom: 20px;
    }
  }
  .govuk-heading-s {
-@@ -460,73 +460,73 @@
- .govuk-caption-m {
-   display: block;
-   color: var(--govuk-secondary-text-colour, #484949);
- }
--.govuk-body-lead, .govuk-body-l {
-+.govuk-body-l, .govuk-body-lead {
-   margin-top: 0;
-   color: var(--govuk-text-colour, #0b0c0c);
-   font-family: "Comic Sans MS", "GDS Transport";
-   -webkit-font-smoothing: antialiased;
-   -moz-osx-font-smoothing: grayscale;
- }
- @media print {
--  .govuk-body-lead, .govuk-body-l {
-+  .govuk-body-l, .govuk-body-lead {
-     font-family: sans-serif;
-   }
- }
--.govuk-body-lead, .govuk-body-l {
-+.govuk-body-l, .govuk-body-lead {
-   font-weight: 400;
-   font-size: 1.3125rem;
-   line-height: 1.1904761905;
- }
- @media (min-width: 40.0625em) {
--  .govuk-body-lead, .govuk-body-l {
-+  .govuk-body-l, .govuk-body-lead {
-     font-size: 1.5rem;
-     line-height: 1.25;
-   }
- }
- @media print {
--  .govuk-body-lead, .govuk-body-l {
-+  .govuk-body-l, .govuk-body-lead {
-     font-size: 18pt;
-     line-height: 1.15;
-   }
- }
--.govuk-body-lead, .govuk-body-l {
-+.govuk-body-l, .govuk-body-lead {
-   margin-bottom: 20px;
- }
- @media (min-width: 40.0625em) {
--  .govuk-body-lead, .govuk-body-l {
-+  .govuk-body-l, .govuk-body-lead {
-     margin-bottom: 30px;
-   }
- }
--.govuk-body, .govuk-body-m {
-+.govuk-body-m, .govuk-body {
-   margin-top: 0;
-   color: var(--govuk-text-colour, #0b0c0c);
-   font-family: "Comic Sans MS", "GDS Transport";
-   -webkit-font-smoothing: antialiased;
-   -moz-osx-font-smoothing: grayscale;
- }
- @media print {
--  .govuk-body, .govuk-body-m {
-+  .govuk-body-m, .govuk-body {
-     font-family: sans-serif;
-   }
- }
--.govuk-body, .govuk-body-m {
-+.govuk-body-m, .govuk-body {
-   font-weight: 400;
-   font-size: 1.1875rem;
-   line-height: 1.3157894737;
- }
- @media print {
--  .govuk-body, .govuk-body-m {
-+  .govuk-body-m, .govuk-body {
-     font-size: 14pt;
-     line-height: 1.15;
-   }
- }
--.govuk-body, .govuk-body-m {
-+.govuk-body-m, .govuk-body {
-   margin-bottom: 15px;
- }
- @media (min-width: 40.0625em) {
--  .govuk-body, .govuk-body-m {
-+  .govuk-body-m, .govuk-body {
-     margin-bottom: 20px;
-   }
- }
- .govuk-body-s {
-@@ -579,21 +579,25 @@
+@@ -512,21 +512,25 @@
    .govuk-list + .govuk-heading-l {
      padding-top: 20px;
    }
@@ -285,8 +198,8 @@ exports[`applies configuration consistently 1`] = `
    margin-top: 5px;
    margin-bottom: 20px;
 @@ -707,12 +711,13 @@
-     flex-wrap: wrap;
      align-items: baseline;
+     margin-right: -15px;
    }
    .govuk-button-group .govuk-button,
 -  .govuk-button-group .govuk-link {
@@ -300,7 +213,7 @@ exports[`applies configuration consistently 1`] = `
    }
  }
  .govuk-form-group::after {
-@@ -4791,9 +4796,9 @@
+@@ -4781,9 +4786,9 @@
      padding-left: 0;
      border: 0;
    }
@@ -311,7 +224,7 @@ exports[`applies configuration consistently 1`] = `
  }
  .govuk-summary-list--no-border .govuk-summary-list__row {
    border: 0;
-@@ -6640,9 +6645,9 @@
+@@ -6595,9 +6600,9 @@
    .moj-button-group {
      margin-bottom: 15px;
    }
@@ -322,7 +235,7 @@ exports[`applies configuration consistently 1`] = `
    max-width: 100%;
    margin-top: 5px;
    margin-bottom: 20px;
-@@ -6651,19 +6656,19 @@
+@@ -6606,19 +6611,19 @@
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
  }
@@ -345,7 +258,7 @@ exports[`applies configuration consistently 1`] = `
      line-height: 19px;
    }
  }
-@@ -6692,16 +6697,17 @@
+@@ -6647,16 +6652,17 @@
      align-items: baseline;
    }
    .moj-button-group--inline .govuk-button,
@@ -364,7 +277,7 @@ exports[`applies configuration consistently 1`] = `
    }
  }
  @media (min-width: 40.0625em) {
-@@ -6712,16 +6718,17 @@
+@@ -6667,16 +6673,17 @@
      align-items: baseline;
    }
    .moj-button-group .govuk-button,
@@ -383,7 +296,7 @@ exports[`applies configuration consistently 1`] = `
    }
  }
  .moj-action-bar {
-@@ -8761,14 +8768,16 @@
+@@ -8716,14 +8723,16 @@
  .moj-interruption-card__actions:last-child {
    margin-bottom: 0;
  }
