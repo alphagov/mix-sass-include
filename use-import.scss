@@ -1,0 +1,6 @@
+@use 'pkg:govuk-frontend';
+@use 'pkg:@ministryofjustice/frontend';
+// HMRC Frontend uses `@import` still, 
+// does it change anything if it gets imported
+// when the other packages are `@use`d?
+@import 'pkg:hmrc-frontend/hmrc/all';
