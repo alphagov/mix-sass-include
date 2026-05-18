@@ -11,8 +11,11 @@
     "sass": "^1.99.0"
   },
   "scripts": {
-    "build:import": "sass --silence-deprecation=import --pkg-importer=node import.scss",
-    "build:use": "sass --silence-deprecation=import --pkg-importer=node use.scss",
+    "build:cli": "sass --silence-deprecation=import --pkg-importer=node", 
+    "build:import": "npm run build:cli -- import.scss",
+    "build:import-configured": "npm run build:cli -- import-configured.scss",
+    "build:use": "npm run build:cli -- use.scss",
+    "build:use-configured": "npm run build:cli -- use-configured.scss",
     "test": "jest",
     "postinstall": "patch-package"
   },

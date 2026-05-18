@@ -1,0 +1,16 @@
+@use 'sass:meta';
+@use 'assets-urls';
+@use 'pkg:govuk-frontend' with (
+    // Applied in many places
+    $govuk-functional-colours: (brand: hotpink),
+    // Overridden by MoJ Frontend
+    // https://github.com/ministryofjustice/moj-frontend/blob/main/src/moj/vendor/govuk-frontend/_index.scss#L8-L21
+    $govuk-font-family: ("Comic Sans MS", "GDS Transport"),
+    // Overridden by MoJ Frontend and HMRC Frontend
+    // https://github.com/hmrc/hmrc-frontend/blob/5ef16a3f442621563476598d61592963cfff9411/src/all.scss#L15
+    $govuk-assets-path: '/somewhere/only/we/know/',
+    // Function configuration
+    $govuk-font-url-function: meta.get-function('fonts-url', $module: assets-urls)
+);
+@use 'pkg:@ministryofjustice/frontend';
+@use 'pkg:hmrc-frontend/hmrc/all';
